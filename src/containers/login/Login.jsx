@@ -1,15 +1,41 @@
+/**
+ * 登陆的一级路由组件
+ */
 import React, { Component } from 'react';
+import {Redirect} from 'react-router-dom';
 import { Form, Icon, Input, Button, Checkbox } from 'antd';
+import qs from 'qs'
+import {connect} from 'react-redux';
+
+import {loginAsync} from '../../redux/action-creators/user';
 import './login.less'
 import logo from './images/logo.png'
+import ajax from '../../api/ajax'
 
 class Login extends Component {
   handleSubmit = e => {
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
+    this.props.form.validateFields((err, {username, password}) => {
       if (!err) {
-        const {username,password} = values
-        console.log('提交登录请求: ',values);
+        console.log('提交登录请求: ',{username, password})
+
+        this.props.loginAsync(username,password)
+        // ajax.post('/login', values)
+        //   .then(result => {
+        //     const {status, data: {user, token}={}, msg, xxx='abc'} = result
+        //     if(status===0){
+        //       console.log('登录成功',user, token)
+        //     }else{
+        //       console.log('登陆失败',msg)
+
+        //     }
+        //   })
+        //   .catch(error=>{
+
+        //   })
+
+      }else{
+
       }
     });
     //读取form收集的数据
@@ -26,6 +52,11 @@ class Login extends Component {
 
   }
   render() {
+    const {hasLogin} = this.props
+    if(hasLogin){ //如果已经登录,自动跳转admin界面
+      // this.props.history.replace('/') //事件回调中使用
+      return <Redirect to="/"/>  //在render()中使用
+    }
     const { getFieldDecorator } = this.props.form;
     return (
       <div className="login">
@@ -90,6 +121,9 @@ class Login extends Component {
     );
   }
 }
-const LoginWrap = Form.create()(Login);
 
-export default LoginWrap;
+
+export default connect(
+  state => ({hasLogin: state.user.hasLogin}),//用于显示的一般属性
+  {loginAsync}//用于更新状态的函数属性
+)(Form.create()(Login))
