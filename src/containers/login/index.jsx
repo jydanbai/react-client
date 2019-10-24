@@ -4,14 +4,21 @@
 import React, { Component } from 'react';
 import {Redirect} from 'react-router-dom';
 import { Form, Icon, Input, Button, Checkbox } from 'antd';
-import qs from 'qs'
 import {connect} from 'react-redux';
 
 import {loginAsync} from '../../redux/action-creators/user';
-import './login.less'
+import './index.less'
 import logo from './images/logo.png'
-import ajax from '../../api/ajax'
+import WithCheckLogin from '../with-check-login';
 
+
+
+@connect(
+  state => ({}),  // 用于显示的一般属性
+  {loginAsync} // 用于更新状态的函数属性
+)
+@Form.create()    // FormLogin = Form.create()(CheckLogin)
+@WithCheckLogin  // CheckLogin = WithCheckLogin(Login)
 class Login extends Component {
   handleSubmit = e => {
     e.preventDefault();
@@ -52,11 +59,6 @@ class Login extends Component {
 
   }
   render() {
-    const {hasLogin} = this.props
-    if(hasLogin){ //如果已经登录,自动跳转admin界面
-      // this.props.history.replace('/') //事件回调中使用
-      return <Redirect to="/"/>  //在render()中使用
-    }
     const { getFieldDecorator } = this.props.form;
     return (
       <div className="login">
@@ -123,7 +125,8 @@ class Login extends Component {
 }
 
 
-export default connect(
-  state => ({hasLogin: state.user.hasLogin}),//用于显示的一般属性
-  {loginAsync}//用于更新状态的函数属性
-)(Form.create()(Login))
+// export default connect(
+//   state => ({hasLogin: state.user.hasLogin}),//用于显示的一般属性
+//   {loginAsync}//用于更新状态的函数属性
+// )(Form.create()(Login))
+export default Login
